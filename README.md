@@ -1,2 +1,2 @@
 # todoapp
-To-Do app via Telegram
+To-Do application served via Telegram
