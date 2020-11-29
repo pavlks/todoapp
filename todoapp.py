@@ -2,8 +2,9 @@ import requests
 import datetime
 import logging
 import json
+import re
 
-from todo_config import PATH, API_TOKEN, PROXY_URL, PROXY_PORT, SECRET, URL, WEBHOOK_HOST
+from todo_config import MONGO_PATH, API_TOKEN, SECRET, URL, WEBHOOK_HOST
 from flask import Flask, Response, request
 from database import Mongodb, Todo
 
@@ -15,8 +16,7 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # Initialize mongodb
-db = Mongodb(PATH)
-print(db)
+db = Mongodb(MONGO_PATH)
 
 @app.route('/')
 def hello_world():
@@ -30,37 +30,18 @@ def telegram_webhook():
         update = request.get_json()  # types of update: https://core.telegram.org/bots/api#update
         message = update['message']['text']
         chat_id = update['message']['from']['id']
-        if re.fullmatch('/\D+'):
-        payload = {
-            'chat_id': chat_id,
-            'text': 'it was a command',
-            'parse_mode': 'HTML',
-            'reply_markup': {
-                'inline_keyboard':[
-                    [{
-                        'text': 'just testin',
-                        'callback_data': 'code123'
-                    }]
-                ]
-            }
-        }
+        
+        if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):
+            payload = {
+                'chat_id': chat_id,
+                'text': 'it was a command',
+                }
         else:
-            todo = Todo.process_input(message)
-            db.add_record(todo.description, todo.today, todo.date, todo.time)
             payload = {
                 'chat_id': chat_id,
                 'text': 'regular text',
-                'parse_mode': 'HTML',
-                'reply_markup': {
-                    'inline_keyboard':[
-                        [{
-                            'text': 'just testin',
-                            'callback_data': 'code123'
-                        }]
-                    ]
                 }
-            }
-        requests.post(URL + '/sendMessage', json=payload)
+        requests.post(URL + '/sendMessage', data=payload)
         return Response('OK', status=200)
     else:
         return Response('OK', status=200)
