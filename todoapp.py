@@ -31,10 +31,18 @@ def telegram_webhook():
         message = update['message']['text']
         chat_id = update['message']['from']['id']
         
-        if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):
+        # if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
+        if re.fullmatch('/today', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
+            todos = db.get_today()
             payload = {
                 'chat_id': chat_id,
-                'text': 'it was a command',
+                'text': todos,
+                }
+        elif re.fullmatch('/all', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
+            todos = db.get_pending()
+            payload = {
+                'chat_id': chat_id,
+                'text': todos,
                 }
         else:
             payload = {
@@ -42,9 +50,8 @@ def telegram_webhook():
                 'text': 'regular text',
                 }
         requests.post(URL + '/sendMessage', data=payload)
-        return Response('OK', status=200)
-    else:
-        return Response('OK', status=200)
+        requests.post(URL + '/sendMessage', data={'chat_id': chat_id, 'text': f'\U2611 or \U0001F536 maybe \U0001F3AF'})
+    return Response('OK', status=200)
 
 
 
