@@ -87,7 +87,7 @@ class Mongodb:
         quantity = min(quantity, len(todos))
         todolist = list()
         for todo in todos[-quantity:]:  #:dart: today;   :ballot_box_with_check: done;   :large_orange_diamond: all todos
-            todolist.append(f"\u2611 <b>{str(todo['description']).upper()}</b>")
+            todolist.append(f"\U00002611 <b>{str(todo['description']).upper()}</b>")
         todos_as_text = "\n\n".join(todolist)
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING COMPLETED TODOS" + "     " + "<" * 20)
         return todos_as_text

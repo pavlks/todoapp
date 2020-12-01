@@ -1,3 +1,5 @@
+# encoding='utf-8'
+# encoding=utf-8
 import requests
 import datetime
 import logging
@@ -34,97 +36,35 @@ def telegram_webhook():
         # if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
         if re.fullmatch('/today', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
             todos = db.get_today()
-            payload = {
-                'chat_id': chat_id,
-                'text': todos,
-                }
+            for todo in todos[:3]:
+                
+                payload = {
+                        'chat_id': chat_id,
+                        'text': todo,
+                        'parse_mode': 'HTML',
+                        'reply_markup': {'inline_keyboard': [[{'text':'add to today', 'callback_data': 'temp123'}]]}
+                        }
+                requests.post(URL + '/sendMessage', json=payload)
+
         elif re.fullmatch('/all', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
             todos = db.get_pending()
-            payload = {
-                'chat_id': chat_id,
-                'text': todos,
-                }
+            for todo in todos[:3]:
+                
+                payload = {
+                        'chat_id': chat_id,
+                        'text': todo,
+                        'parse_mode': 'HTML',
+                        'reply_markup': {'inline_keyboard': [[{'text':'add to today', 'callback_data': 'temp123'}]]}
+                        }
+                requests.post(URL + '/sendMessage', json=payload)
+
         else:
             payload = {
                 'chat_id': chat_id,
                 'text': 'regular text',
                 }
-        requests.post(URL + '/sendMessage', data=payload)
-        requests.post(URL + '/sendMessage', data={'chat_id': chat_id, 'text': f'\U2611 or \U0001F536 maybe \U0001F3AF'})
+        requests.post(URL + '/sendMessage', data={'chat_id': chat_id, 'text': '\U00002611'})
     return Response('OK', status=200)
-
-
-
-
-"""
-@dp.message_handler(regexp='today')
-async def get_today(message: types.Message):
-    await message.delete()
-    inline_kb_all = InlineKeyboardMarkup()
-    inline_kb_all.row(InlineKeyboardButton(emojize('Убрать задание'), callback_data='courses'))
-    inline_kb_all.insert(InlineKeyboardButton(emojize(':point_up: Done'), callback_data='faq'))
-    todolist = db.get_today()
-    for msg in todolist[:2]:
-        await message.answer(emojize(msg), 'html', reply_markup=inline_kb_all)
-        await asyncio.sleep(0.5)
-
-
-
-
-
-@dp.message_handler(regexp='welcome')
-async def testing(message: types.Message):
-    await message.edit_text
-    inline_kb_all = InlineKeyboardMarkup()
-    inline_kb_all.row(InlineKeyboardButton(emojize('Убрать задание'), callback_data='courses'))
-    inline_kb_all.insert(InlineKeyboardButton(emojize(':point_up: Done'), callback_data='faq'))
-    todolist = db.get_today()
-    for msg in todolist[:2]:
-        await message.answer(emojize(msg), 'html', reply_markup=inline_kb_all)
-        await asyncio.sleep(0.5)
-
-
-
-
-@dp.message_handler(regexp='all')
-async def get_pending(message: types.Message):
-    inline_kb_all = InlineKeyboardMarkup()
-    inline_kb_all.row(InlineKeyboardButton(emojize('Добавить на СЕГОДНЯ'), callback_data='courses'))
-    # inline_kb_all.row(InlineKeyboardButton(emojize(':point_up: Ответы на часто задаваемые вопросы'), callback_data='faq'))
-    todolist = db.get_pending()
-    msg = '\n\n'.join(todolist[0:8])
-    await message.answer(emojize(msg), 'html')
-
-
-@dp.message_handler(regexp='clear')
-async def clear_today(message: types.Message):
-    msg = db.clear_today()
-    await message.answer(msg, 'html')
-
-
-@dp.message_handler(regexp='gg')
-async def gg(message: types.Message):
-    db.show_today()
-    await message.answer('toggle: DONE')
-
-
-@dp.message_handler()
-async def send_welcome(message: types.Message):
-    td = Todo.process_input(message.text)
-    post_id = db.add_record(td.description, td.today, td.date, td.time)
-    await message.answer('hello: ' + td.description)
-
-"""
-
-
-
-
-
-
-
-
-
-
 
 
 
