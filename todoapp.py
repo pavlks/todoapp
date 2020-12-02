@@ -34,21 +34,44 @@ def telegram_webhook():
         chat_id = update['message']['from']['id']
         
         # if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
-        if re.fullmatch('/today', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
+        if re.fullmatch('/today', message, flags=re.IGNORECASE):
             todos = db.get_today()
-            for todo in todos[:3]:
-                
+            for todo in todos[:1]:
+            
                 payload = {
                         'chat_id': chat_id,
-                        'text': todo,
+                        'text': str(todo[0]),
                         'parse_mode': 'HTML',
-                        'reply_markup': {'inline_keyboard': [[{'text':'add to today', 'callback_data': 'temp123'}]]}
+                        'reply_markup': {'inline_keyboard': [[{'text':'mark as', 'callback_data': todo[1]}]]}
                         }
-                requests.post(URL + '/sendMessage', json=payload)
+                m = requests.post(URL + '/sendMessage', json=payload)
+
+                mj = m.json()
+                message_text = mj['result']['text']
+                message_id = mj['result']['message_id']
+                message_chat_id = mj['result']['chat']['id']
+                message_reply_markup = mj['result']['reply_markup']
+                message_reply_markup['inline_keyboard'][0][0]['callback_data'] += f' {message_id}'
+                message_reply_markup['inline_keyboard'][0][0]['text'] += f' complete'
+                
+                params = {
+                        'chat_id': message_chat_id,
+                        'message_id': message_id,
+                        'reply_markup': message_reply_markup,
+                        }
+
+                requests.post(URL + '/editMessageReplyMarkup', json=params)
+
+
+
+
+
+
+
 
         elif re.fullmatch('/all', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
             todos = db.get_pending()
-            for todo in todos[:3]:
+            for todo in todos[:2]:
                 
                 payload = {
                         'chat_id': chat_id,

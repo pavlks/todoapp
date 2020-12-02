@@ -42,8 +42,8 @@ class Mongodb:
         todolist = list()
         for todo in todos:  #:dart: today;   :ballot_box_with_check: done;   :large_orange_diamond: all todos
             # todolist.append(f":dart: <b>{str(todo['description']).upper()}</b>")
-            todolist.append(f"\U0001F3AF <b>{str(todo['description']).upper()}</b>")
-        todos_as_text = "\n\n".join(todolist)
+            line = tuple((f"\U0001F3AF <b>{str(todo['description']).upper()}</b>", str(todo['_id'])))
+            todolist.append(line)
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING TODAY TODOS" + "     " + "<" * 20)
         return todolist
 
