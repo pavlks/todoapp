@@ -6,6 +6,7 @@ import re
 import datetime
 
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 
 class Mongodb:
@@ -67,20 +68,20 @@ class Mongodb:
         return matched, modified
 
     def toggle_today(self, _id):
-        record = self.collection.find_one({'_id': record})
+        record = self.collection.find_one({'_id': ObjectId(_id)})
         status = record['today']
         if status is True:
-            self.collection.update_one({'_id': record}, {'$set': {'today': False}})
+            self.collection.update_one({'_id': ObjectId(_id)}, {'$set': {'today': False}})
             logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO MOVED TO UPCOMMING (_id: {_id}, description: {description})" + "     " + "<" * 20)
             return False
         else:
-            self.collection.update_one({'_id': record}, {'$set': {'today': True}})
+            self.collection.update_one({'_id': ObjectId(_id)}, {'$set': {'today': True}})
             logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO MOVED TO TODAY (_id: {_id}, description: {description})" + "     " + "<" * 20)
             return True
 
     def set_done(self, _id):
-        record = self.collection.find_one({'_id': record})
-        self.collection.update_one({'_id': record}, {'$set': {'done': True}})
+        record = self.collection.find_one({'_id': ObjectId(_id)})
+        self.collection.update_one({'_id': ObjectId(_id)}, {'$set': {'done': True}})
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO SET AS COMPLETED (_id: {_id}, description: {description})" + "     " + "<" * 20)
         return True
 

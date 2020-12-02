@@ -21,10 +21,10 @@ logging.basicConfig(level=logging.INFO)
 # Initialize mongodb
 db = Mongodb(MONGO_PATH)
 
+
 @app.route('/')
 def hello_world():
     return "Welcome"
-
 
 
 @app.route(f'/{SECRET}', methods=['POST', 'GET'])
@@ -32,10 +32,12 @@ def telegram_webhook():
     if request.method == 'POST':
         update = request.get_json()  # types of update: https://core.telegram.org/bots/api#update
         message = update['message']['text']
+        callback_query = update['callback_query']['data']
+        callback_query_id = update['callback_query']['id']
         chat_id = update['message']['from']['id']
         
-        # if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
-        if re.fullmatch('/today', message, flags=re.IGNORECASE):
+        # if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):  # one-word command is matched (example "/start")
+        if update['message'] and re.fullmatch('/today', message, flags=re.IGNORECASE):
             todos = db.get_today()
             for todo in todos[:1]:
             
@@ -43,34 +45,26 @@ def telegram_webhook():
                         'chat_id': chat_id,
                         'text': str(todo[0]),
                         'parse_mode': 'HTML',
-                        'reply_markup': {'inline_keyboard': [[{'text':'mark as', 'callback_data': todo[1]}]]}
+                        'reply_markup': {'inline_keyboard': [[{'text':'mark as', 'callback_data': f'done {todo[1]}'}]]}
                         }
                 m = requests.post(URL + '/sendMessage', json=payload)
 
                 mj = m.json()
                 message_text = mj['result']['text']
                 message_id = mj['result']['message_id']
-                message_chat_id = mj['result']['chat']['id']
                 message_reply_markup = mj['result']['reply_markup']
                 message_reply_markup['inline_keyboard'][0][0]['callback_data'] += f' {message_id}'
                 message_reply_markup['inline_keyboard'][0][0]['text'] += f' complete'
                 
                 params = {
-                        'chat_id': message_chat_id,
+                        'chat_id': chat_id,
                         'message_id': message_id,
                         'reply_markup': message_reply_markup,
                         }
 
                 requests.post(URL + '/editMessageReplyMarkup', json=params)
 
-
-
-
-
-
-
-
-        elif re.fullmatch('/all', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
+        elif update['message'] and re.fullmatch('/all', message, flags=re.IGNORECASE):  # when 1 word command is matched (example "/start")
             todos = db.get_pending()
             for todo in todos[:2]:
                 
@@ -81,6 +75,20 @@ def telegram_webhook():
                         'reply_markup': {'inline_keyboard': [[{'text':'add to today', 'callback_data': 'temp123'}]]}
                         }
                 requests.post(URL + '/sendMessage', json=payload)
+
+        elif update['callback_query'] and re.match('done', callback_query):
+            todo_id, msg_id = [x for x in str(callback_query).split()[1:]]
+            msg_id = int(msg_id)
+            db.set_done(todo_id)
+
+            payload = {
+                    'callback_query_id': callback_query_id,
+            }
+            
+            requests.post(URL + '/answerCallbackQuery', json=payload)
+
+
+
 
         else:
             payload = {
