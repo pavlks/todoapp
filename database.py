@@ -43,8 +43,7 @@ class Mongodb:
     def get_today(self):
         todos = self.collection.find({'today': True, 'done': False})
         todolist = list()
-        for todo in todos:  #:dart: today;   :ballot_box_with_check: done;   :large_orange_diamond: all todos
-            # todolist.append(f":dart: <b>{str(todo['description']).upper()}</b>")
+        for todo in todos:  #\U0001F3AF :dart: today;   \U00002611 :ballot_box_with_check: done;   \U0001F536 :large_orange_diamond: all todos
             line = tuple((f"\U0001F3AF <b>{str(todo['description']).upper()}</b>", str(todo['_id'])))
             todolist.append(line)
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING TODAY TODOS" + "     " + "<" * 20)
@@ -53,10 +52,9 @@ class Mongodb:
     def get_pending(self):
         todos = self.collection.find({'done': False})
         todolist = list()
-        for todo in todos:  #:dart: today;   :ballot_box_with_check: done;   :large_orange_diamond: all todos
-            # todolist.append(f":large_orange_diamond: <b>{str(todo['description']).upper()}</b>")
-            todolist.append(f"\U0001F536 <b>{str(todo['description']).upper()}</b>")
-        todos_as_text = "\n\n".join(todolist)
+        for todo in todos:
+            line = tuple((f"\U0001F536 <b>{str(todo['description']).upper()}</b>", str(todo['_id'])))
+            todolist.append(line)
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING PENDING TODOS" + "     " + "<" * 20)
         return todolist
 
@@ -72,24 +70,29 @@ class Mongodb:
         status = record['today']
         if status is True:
             self.collection.update_one({'_id': ObjectId(_id)}, {'$set': {'today': False}})
-            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO MOVED TO UPCOMMING (_id: {_id}, description: {description})" + "     " + "<" * 20)
+            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO MOVED TO UPCOMMING (_id: {_id}, description: {record['description']})" + "     " + "<" * 20)
             return False
         else:
             self.collection.update_one({'_id': ObjectId(_id)}, {'$set': {'today': True}})
-            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO MOVED TO TODAY (_id: {_id}, description: {description})" + "     " + "<" * 20)
+            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO MOVED TO TODAY (_id: {_id}, description: {record['description']})" + "     " + "<" * 20)
             return True
 
-    def set_done(self, _id):
+    def toggle_done(self, _id):
         record = self.collection.find_one({'_id': ObjectId(_id)})
-        self.collection.update_one({'_id': ObjectId(_id)}, {'$set': {'done': True}})
-        logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO SET AS COMPLETED (_id: {_id}, description: {description})" + "     " + "<" * 20)
-        return True
+        status = record['done']
+        if status is True:
+            self.collection.update_one({'_id': ObjectId(_id)}, {'$set': {'done': False, 'date-done': None}})
+            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO SET AS UNDONE (_id: {_id}, description: {record['description']})" + "     " + "<" * 20)
+            return False
+        else:
+            self.collection.update_one({'_id': ObjectId(_id)}, {'$set': {'done': True, 'date-done': datetime.datetime.now()}})
+            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO SET AS COMPLETED (_id: {_id}, description: {record['description']})" + "     " + "<" * 20)
+            return True
 
     def get_completed(self, quantity=10):
-        todos = self.collection.find({'done': True})
-        quantity = min(quantity, len(todos))
+        todos = self.collection.find({'done': True}).sort('date-done', pymongo.DESCENDING).limit(quantity)
         todolist = list()
-        for todo in todos[-quantity:]:  #:dart: today;   :ballot_box_with_check: done;   :large_orange_diamond: all todos
+        for todo in todos:
             todolist.append(f"\U00002611 <b>{str(todo['description']).upper()}</b>")
         todos_as_text = "\n\n".join(todolist)
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING COMPLETED TODOS" + "     " + "<" * 20)
@@ -115,11 +118,9 @@ class Todo:
         date = None
         time = None
         if re.search('(today|hoy|сегодня)', user_input, flags=re.IGNORECASE):
-            print('HERE: today')
             today = True
             date = datetime.date.today()
         elif re.search('(tomorrow|manana|manaña|завтра)', user_input, flags=re.IGNORECASE):
-            print('HERE: tomorrow')
             today = False
             date = datetime.date.today() + datetime.timedelta(days=1)
         elif re.search('(day after tomorrow|pasado manana|pasado manaña|послезавтра)', user_input, flags=re.IGNORECASE):
