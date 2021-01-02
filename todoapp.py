@@ -174,7 +174,7 @@ def telegram_webhook():
 
         else:
             todo = Todo.process_input(message)
-            db.add_record(todo.description, todo.today, todo.date, todo.time)
+            db.add_record(todo.description, todo.is_today, todo.notify_date, todo.notify_time)
             payload = {
                     'chat_id': chat_id,
                     'text': '<b>new to-do was added</b>',
