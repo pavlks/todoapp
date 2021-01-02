@@ -14,13 +14,13 @@ class SQLdatabase:
         self.todos = Table(
             'todos', metadata,
             Column('id', types.Integer, Sequence('todo_id_seq'), primary_key=True),
-            Column('created', types.Datetime),
+            Column('created', types.DateTime),
             Column('description', types.Text),
             Column('notify_date', types.Date),
             Column('notify_time', types.Time),
             Column('is_today', types.Boolean),
             Column('category', types.Text(60)),
-            Column('completed', types.Datetime)
+            Column('completed', types.DateTime)
         )
         metadata.create_all(self.engine, checkfirst=True)  # Defaults to True, won’t issue CREATEs for tables already present in the target database. To be aware of this option.:
 
