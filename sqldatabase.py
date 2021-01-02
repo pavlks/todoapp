@@ -44,7 +44,7 @@ class SQLdatabase:
 
     def show_today(self):
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING TODAY TODOS" + "     " + "<" * 20)
-        sel = select([self.todos]).where(self.todos.c.is_today == True)
+        sel = select([self.todos]).where(self.todos.c.is_today == True).where(self.todos.c.completed != None)
         connection = self.engine.connect()
         res = connection.execute(sel)
         ts = str()
@@ -99,9 +99,6 @@ class SQLdatabase:
         res = connection.execute(sel)
         row = res.fetchone()
         status = row['completed']
-        logging.info(status)
-        logging.info(status)
-        logging.info(status)
         if status is True:
             logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO SET AS PENDING (id: {id}, description: {row['description']})" + "     " + "<" * 20)
             stmt = self.todos.update().\
