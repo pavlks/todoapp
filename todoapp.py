@@ -9,7 +9,7 @@ import re
 
 from todo_config import MONGO_PATH, API_TOKEN, SECRET, URL, WEBHOOK_HOST
 from flask import Flask, Response, request
-from database import Mongodb, Todo
+from sqldatabase import SQLdatabase, Todo
 
 
 # Starting server
