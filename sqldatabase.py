@@ -99,6 +99,9 @@ class SQLdatabase:
         res = connection.execute(sel)
         row = res.fetchone()
         status = row['completed']
+        logging.info(status)
+        logging.info(status)
+        logging.info(status)
         if status is True:
             logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO SET AS PENDING (id: {id}, description: {row['description']})" + "     " + "<" * 20)
             stmt = self.todos.update().\
