@@ -16,8 +16,8 @@ class SQLdatabase:
             Column('id', types.INTEGER, Sequence('todo_id_seq'), primary_key=True),
             Column('created', types.DATETIME),
             Column('description', types.TEXT),
-            Column('notify_date', types.DATE),
-            Column('notify_time', types.TIME),
+            Column('notify_date', types.DATE, nullable=True),
+            Column('notify_time', types.TIME, nullable=True),
             Column('is_today', types.BOOLEAN),
             Column('category', types.TEXT(60)),
             Column('completed', types.DATETIME)
@@ -28,12 +28,10 @@ class SQLdatabase:
         ins = self.todos.insert().values(
             description=description,
             created=datetime.datetime.utcnow(),
-            #  notify_date=notify_date,
-            #  notify_time=notify_time,
-            #  is_today=is_today,
-            #  category=category,
-            notify_date=datetime.date(year=datetime.datetime.utcnow().year, month=datetime.datetime.utcnow().month, day=datetime.datetime.utcnow().day),
-            notify_time=datetime.time(hour=datetime.datetime.utcnow().hour, minute=datetime.datetime.utcnow().minute, second=datetime.datetime.utcnow().second),
+            notify_date=notify_date,
+            notify_time=notify_time,
+            #  notify_date=datetime.date(year=datetime.datetime.utcnow().year, month=datetime.datetime.utcnow().month, day=datetime.datetime.utcnow().day),
+            #  notify_time=datetime.time(hour=datetime.datetime.utcnow().hour, minute=datetime.datetime.utcnow().minute, second=datetime.datetime.utcnow().second),
             is_today=is_today,
             category=category,
             completed=None
