@@ -18,8 +18,8 @@ app = Flask(__name__)
 # Configure logging
 logging.basicConfig(filename='logtodo.log', encoding='utf-8', level=logging.DEBUG)
 
-# Initialize mongodb
-db = Mongodb(MONGO_PATH)
+# Initialize sqlite database
+db = SQLdatabase()
 
 
 @app.route('/')

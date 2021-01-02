@@ -163,19 +163,3 @@ class Todo:
             time = string[2:]
 
         return cls(description=user_input)
-    
-
-
-
-
-
-
-
-
-
-
-
-########################################################
-new = SQLdatabase()
-#  new.add_record('hello pipl')
-new.toggle_today(1)
