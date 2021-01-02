@@ -102,7 +102,7 @@ def telegram_webhook():
                 requests.post(URL + '/editMessageReplyMarkup', json=params)
 
         elif message and re.fullmatch('/completed', message, flags=re.IGNORECASE):
-            todos = db.get_completed()
+            todos = db.show_completed()
                 
             payload = {
                     'chat_id': chat_id,
@@ -164,7 +164,7 @@ def telegram_webhook():
             params1 = {'callback_query_id': callback_query_id,}
             requests.post(URL + '/answerCallbackQuery', json=params1)
 
-            todos = db.get_completed(quantity)
+            todos = db.show_completed(quantity)
 
             msg_reply_markup['inline_keyboard'][0][0]['callback_data'] = f'completed {quantity + 10}'
             params2 = {'chat_id': chat_id, 'message_id': msg_id, 'text': todos, 'parse_mode': 'HTML', 'reply_markup': msg_reply_markup}

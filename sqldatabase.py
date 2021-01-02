@@ -109,9 +109,10 @@ class SQLdatabase:
             stmt = self.todos.update().\
                         where(self.todos.c.id == id).\
                         values(completed=datetime.datetime.utcnow())
+        res = connection.execute(stmt)
         return not status
 
-    def get_completed(self, quantity=10):
+    def show_completed(self, quantity=10):
         logging.info("  " + str(datetime.datetime.utcnow()) + "  " + ">" * 20 + "     " + "GETTING COMPLETED TODOS" + "     " + "<" * 20)
         sel = select([self.todos]).where(self.todos.c.completed != None)
         connection = self.engine.connect()
