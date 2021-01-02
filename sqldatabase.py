@@ -138,9 +138,10 @@ class Todo:
         
     @classmethod
     def process_input(cls, user_input):
-        is_today = True
         notify_date = None
         notify_time = None
+        is_today = True
+        category = None
         if re.search('(today|hoy|сегодня)', user_input, flags=re.IGNORECASE):
             today = True
             date = datetime.date.today()
@@ -162,4 +163,4 @@ class Todo:
             hh = string[:2]
             time = string[2:]
 
-        return cls(description=user_input)
+        return cls(description=user_input, notify_date=notify_date, notify_time=notify_time, is_today=is_today, category=category)
