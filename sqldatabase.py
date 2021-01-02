@@ -24,15 +24,15 @@ class SQLdatabase:
         )
         metadata.create_all(self.engine, checkfirst=True)  # Defaults to True, won’t issue CREATEs for tables already present in the target database. To be aware of this option.:
 
-    def add_record(self, description, created=datetime.datetime.utcnow(), notify_date=None, notify_time=None, is_today=True, category=None, completed=None):
+    def add_record(self, description, notify_date, notify_time, is_today, category):
         ins = self.todos.insert().values(
             description=description,
-            created=created,
+            created=datetime.datetime.utcnow(),
             notify_date=notify_date,
             notify_time=notify_time,
             is_today=is_today,
             category=category,
-            completed=completed
+            completed=None
         )
         connection = self.engine.connect()
         with connection.begin():
@@ -163,4 +163,8 @@ class Todo:
             hh = string[:2]
             time = string[2:]
 
-        return cls(description=user_input, notify_date=notify_date, notify_time=notify_time, is_today=is_today, category=category)
+        return cls(user_input, notify_date, notify_time, is_today, category)
+#  i = Todo.process_input('hello_world')
+#  r = SQLdatabase()
+#  r.add_record(i.description, i.notify_date, i.notify_time, i.is_today, i.category)
+
