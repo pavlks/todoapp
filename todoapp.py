@@ -172,8 +172,8 @@ def telegram_webhook():
             
         elif callback_query and re.match('(confirm|cancel)', callback_query, flags=re.IGNORECASE):
             if callback_query == 'confirm':
-                matched, modified = db.clear_today()
-                params = {'callback_query_id': callback_query_id, 'text': f"{modified} items were cleared from today's to-do list", 'show_alert': True}
+                db.clear_today()
+                params = {'callback_query_id': callback_query_id, 'text': f"items were cleared from today's to-do list", 'show_alert': True}
             else:
                 params = {'callback_query_id': callback_query_id, 'text': 'operation was cancelled', 'show_alert': True}
             requests.post(URL + '/answerCallbackQuery', json=params)
