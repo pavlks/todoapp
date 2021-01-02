@@ -55,7 +55,7 @@ class SQLdatabase:
 
     def get_pending(self):
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING PENDING TODOS" + "     " + "<" * 20)
-        sel = select([self.todos]).where(self.todos.c.completed == False)
+        sel = select([self.todos]).where(self.todos.c.completed == None)
         connection = self.engine.connect()
         res = connection.execute(sel)
         tl = list()
@@ -113,7 +113,7 @@ class SQLdatabase:
 
     def get_completed(self, quantity=10):
         logging.info("  " + str(datetime.datetime.utcnow()) + "  " + ">" * 20 + "     " + "GETTING COMPLETED TODOS" + "     " + "<" * 20)
-        sel = select([self.todos]).where(self.todos.c.completed == True)
+        sel = select([self.todos]).where(self.todos.c.completed != None)
         connection = self.engine.connect()
         res = connection.execute(sel)
         ts = str()
