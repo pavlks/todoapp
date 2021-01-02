@@ -128,7 +128,7 @@ class SQLdatabase:
 
 
 class Todo:
-    def __init__(self, description):
+    def __init__(self, description, notify_date, notify_time, is_today, category):
         self.created = datetime.datetime.utcnow()
         self.description = description
         self.notify_date = notify_date
