@@ -128,7 +128,7 @@ def telegram_webhook():
             params1 = {'callback_query_id': callback_query_id,}
             requests.post(URL + '/answerCallbackQuery', json=params1)
 
-            db.toggle_done(todo_id)
+            db.toggle_completed(todo_id)
 
             #\U0001F3AF :dart: today;   \U00002611 :ballot_box_with_check: done;   \U0001F536 :large_orange_diamond: all todos
             if re.match('done', callback_query, flags=re.IGNORECASE):

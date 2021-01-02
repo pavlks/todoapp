@@ -42,7 +42,7 @@ class SQLdatabase:
         with connection.begin():
             res = connection.execute(ins)
             id = res.inserted_primary_key
-            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO CREATED (id: {id}, description: {description})" + "     " + "<" * 20)
+            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO CREATED (id: {id}, description: {description}" + "     " + "<" * 20)
         return id
 
     def show_today(self):
@@ -96,7 +96,7 @@ class SQLdatabase:
         res = connection.execute(stmt)
         return not status
 
-    def toggle_done(self, id):
+    def toggle_completed(self, id):
         sel = select([self.todos]).where(self.todos.c.id == id)
         connection = self.engine.connect()
         res = connection.execute(sel)
