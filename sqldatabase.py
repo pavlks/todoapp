@@ -50,7 +50,7 @@ class SQLdatabase:
         ts = str()
         nl = "\n"
         for row in res:  #\U0001F3AF :dart: today;   \U00002611 :ballot_box_with_check: done;   \U0001F536 :large_orange_diamond: all todos
-            ts += f"\U0001F3AF <b>{str(row['description']).upper()}</b>{nl}"
+            ts += f"\U0001F3AF <b>{str(row['description']).upper()}</b>{nl}{nl}"
         return ts
 
     def get_pending(self):

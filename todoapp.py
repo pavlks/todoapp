@@ -38,31 +38,38 @@ def telegram_webhook():
         # if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):  # one-word command is matched (example "/start")
         
         if message and re.fullmatch('/today', message, flags=re.IGNORECASE):
-            todos = db.get_today()
-            for todo in todos:
+            todos = db.show_today()
+            payload = {
+                    'chat_id': chat_id,
+                    'text': todos,
+                    'parse_mode': 'HTML',
+                    }
+            requests.post(URL + '/sendMessage', json=payload)
+            #  todos = db.show_today()
+            #  for todo in todos:
             
-                payload = {
-                        'chat_id': chat_id,
-                        'text': todo[0],
-                        'parse_mode': 'HTML',
-                        'reply_markup': {'inline_keyboard': [[{'text':'mark as', 'callback_data': f'done {todo[1]}'}]]}
-                        }
-                m = requests.post(URL + '/sendMessage', json=payload)
+                #  payload = {
+                        #  'chat_id': chat_id,
+                        #  'text': todo[0],
+                        #  'parse_mode': 'HTML',
+                        #  'reply_markup': {'inline_keyboard': [[{'text':'mark as', 'callback_data': f'done {todo[1]}'}]]}
+                        #  }
+                #  m = requests.post(URL + '/sendMessage', json=payload)
 
-                mj = m.json()
-                message_text = mj['result']['text']
-                message_id = mj['result']['message_id']
-                message_reply_markup = mj['result']['reply_markup']
-                message_reply_markup['inline_keyboard'][0][0]['callback_data'] += f' {message_id}'
-                message_reply_markup['inline_keyboard'][0][0]['text'] += f' complete'
+                #  mj = m.json()
+                #  message_text = mj['result']['text']
+                #  message_id = mj['result']['message_id']
+                #  message_reply_markup = mj['result']['reply_markup']
+                #  message_reply_markup['inline_keyboard'][0][0]['callback_data'] += f' {message_id}'
+                #  message_reply_markup['inline_keyboard'][0][0]['text'] += f' complete'
                 
-                params = {
-                        'chat_id': chat_id,
-                        'message_id': message_id,
-                        'reply_markup': message_reply_markup,
-                        }
+                #  params = {
+                        #  'chat_id': chat_id,
+                        #  'message_id': message_id,
+                        #  'reply_markup': message_reply_markup,
+                        #  }
 
-                requests.post(URL + '/editMessageReplyMarkup', json=params)
+                #  requests.post(URL + '/editMessageReplyMarkup', json=params)
 
         elif message and re.fullmatch('/all', message, flags=re.IGNORECASE):
             todos = db.get_pending()
