@@ -13,14 +13,14 @@ class SQLdatabase:
         metadata = MetaData()
         self.todos = Table(
             'todos', metadata,
-            Column('id', types.Integer, Sequence('todo_id_seq'), primary_key=True),
-            Column('created', types.DateTime),
-            Column('description', types.Text),
-            Column('notify_date', types.Date),
-            Column('notify_time', types.Time),
-            Column('is_today', types.Boolean),
-            Column('category', types.Text(60)),
-            Column('completed', types.DateTime)
+            Column('id', types.INTEGER, Sequence('todo_id_seq'), primary_key=True),
+            Column('created', types.DATETIME),
+            Column('description', types.TEXT),
+            Column('notify_date', types.DATE),
+            Column('notify_time', types.TIME),
+            Column('is_today', types.BOOLEAN),
+            Column('category', types.TEXT(60)),
+            Column('completed', types.DATETIME)
         )
         metadata.create_all(self.engine, checkfirst=True)  # Defaults to True, won’t issue CREATEs for tables already present in the target database. To be aware of this option.:
 
@@ -42,7 +42,7 @@ class SQLdatabase:
         with connection.begin():
             res = connection.execute(ins)
             id = res.inserted_primary_key
-            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO CREATED (id: {id}, description: {description}" + "     " + "<" * 20)
+            logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO CREATED id: {id}, description: [{description}]" + "     " + "<" * 20)
         return id
 
     def show_today(self):
