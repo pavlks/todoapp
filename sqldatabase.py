@@ -28,14 +28,14 @@ class SQLdatabase:
         ins = self.todos.insert().values(
             description=description,
             created=datetime.datetime.utcnow(),
-            #  notify_date=notify_date,
-            #  notify_time=notify_time,
+            notify_date=notify_date,
+            notify_time=notify_time,
             #  is_today=is_today,
             #  category=category,
-            notify_date=datetime.date(year=datetime.datetime.utcnow().year, month=datetime.datetime.utcnow().month, day=datetime.datetime.utcnow().day),
-            notify_time=datetime.time(hour=datetime.datetime.utcnow().hour, minute=datetime.datetime.utcnow().minute, second=datetime.datetime.utcnow().second),
+            #  notify_date=datetime.date(year=datetime.datetime.utcnow().year, month=datetime.datetime.utcnow().month, day=datetime.datetime.utcnow().day),
+            #  notify_time=datetime.time(hour=datetime.datetime.utcnow().hour, minute=datetime.datetime.utcnow().minute, second=datetime.datetime.utcnow().second),
             is_today=is_today,
-            category='test',
+            category=category,
             completed=None
         )
         connection = self.engine.connect()
