@@ -129,13 +129,13 @@ class SQLdatabase:
 
 class Todo:
     def __init__(self, description):
-        #  self.created = datetime.datetime.utcnow()
+        self.created = datetime.datetime.utcnow()
         self.description = description
-        #  self.notify_date = notify_date
-        #  self.notify_time = notify_time
-        #  self.is_today = is_today
-        #  self.category = category
-        #  self.completed = False
+        self.notify_date = notify_date
+        self.notify_time = notify_time
+        self.is_today = is_today
+        self.category = category
+        self.completed = False
 
     def __str__(self):
         return self.description
@@ -167,8 +167,8 @@ class Todo:
             hh = string[:2]
             time = string[2:]
 
-        return cls(user_input)
-        #  return cls(user_input, notify_date, notify_time, is_today, category)
+        #  return cls(user_input)
+        return cls(user_input, notify_date, notify_time, is_today, category)
 #  i = Todo.process_input('hello_world')
 #  r = SQLdatabase()
 #  r.add_record(i.description, i.notify_date, i.notify_time, i.is_today, i.category)
