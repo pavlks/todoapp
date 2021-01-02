@@ -16,8 +16,8 @@ class SQLdatabase:
             Column('id', types.INTEGER, Sequence('todo_id_seq'), primary_key=True),
             Column('created', types.DATETIME),
             Column('description', types.TEXT),
-            Column('notify_date', types.DATE, nullable=True),
-            Column('notify_time', types.TIME, nullable=True),
+            Column('notify_date', types.Date),
+            Column('notify_time', types.Time),
             Column('is_today', types.BOOLEAN),
             Column('category', types.TEXT(60)),
             Column('completed', types.DATETIME)
