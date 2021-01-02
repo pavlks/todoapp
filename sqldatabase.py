@@ -9,12 +9,13 @@ from sqlalchemy.sql import select
 
 class SQLdatabase:
     def __init__(self):
-        self.engine = create_engine('sqlite:///local.db', echo=True, echo_pool='debug')
+        self.engine = create_engine('sqlite:///local.db', echo=True, echo_pool='info')
         metadata = MetaData()
         self.todos = Table(
             'todos', metadata,
             Column('id', types.INTEGER, Sequence('todo_id_seq'), primary_key=True),
-            Column('created', types.DATETIME),
+            # Compatibility with sqlite3 “native” date and datetime types (https://docs.sqlalchemy.org/en/13/dialects/sqlite.html?highlight=parse_decltypes#compatibility-with-sqlite3-native-date-and-datetime-types)
+            Column('created', types.DATETIME),  
             Column('description', types.TEXT),
             Column('notify_date', types.DATE),
             Column('notify_time', types.TIME),
@@ -28,10 +29,8 @@ class SQLdatabase:
         ins = self.todos.insert().values(
             description=description,
             created=datetime.datetime.utcnow(),
-            notify_date=None,
-            notify_time=None,
-            #  notify_date=datetime.date(year=datetime.datetime.utcnow().year, month=datetime.datetime.utcnow().month, day=datetime.datetime.utcnow().day),
-            #  notify_time=datetime.time(hour=datetime.datetime.utcnow().hour, minute=datetime.datetime.utcnow().minute, second=datetime.datetime.utcnow().second),
+            notify_date=notify_date,
+            notify_time=notify_time,
             is_today=is_today,
             category=category,
             completed=None
@@ -167,7 +166,4 @@ class Todo:
 
         #  return cls(user_input)
         return cls(user_input, notify_date, notify_time, is_today, category)
-#  i = Todo.process_input('hello_world')
-#  r = SQLdatabase()
-#  r.add_record(i.description, i.notify_date, i.notify_time, i.is_today, i.category)
 
