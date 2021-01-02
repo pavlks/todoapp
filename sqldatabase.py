@@ -143,18 +143,18 @@ class Todo:
         is_today = True
         category = None
         if re.search('(today|hoy|сегодня)', user_input, flags=re.IGNORECASE):
-            today = True
-            date = datetime.date.today()
+            is_today = True
+            notify_date = datetime.date.today()
         elif re.search('(tomorrow|manana|manaña|завтра)', user_input, flags=re.IGNORECASE):
-            today = False
-            date = datetime.date.today() + datetime.timedelta(days=1)
+            is_today = False
+            notify_date = datetime.date.today() + datetime.timedelta(days=1)
         elif re.search('(day after tomorrow|pasado manana|pasado manaña|послезавтра)', user_input, flags=re.IGNORECASE):
-            today = False
-            date = datetime.date.today() + datetime.timedelta(days=2)
+            is_today = False
+            notify_date = datetime.date.today() + datetime.timedelta(days=2)
         elif re.search(r'(in \d+ days?|en \d+ d[ií]as?|через \d+ де?н(я|ей|ь))', user_input, flags=re.IGNORECASE):
-            today = False
+            is_today = False
             td = re.search(r'(in \d+ days?|en \d+ d[ií]as?|через \d+ де?н(я|ей|ь))', user_input, flags=re.IGNORECASE).group(0)
-            date = datetime.date.today() + datetime.timedelta(days=int(td))
+            notify_date = datetime.date.today() + datetime.timedelta(days=int(td))
 
         # добавить обработку прибавления даты на 1 и более месяцев, если есть упоминание в сообщении 'через месяц' или 'через 3 месяца'
 
