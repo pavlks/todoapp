@@ -9,7 +9,7 @@ from sqlalchemy.sql import select
 
 class SQLdatabase:
     def __init__(self):
-        self.engine = create_engine('sqlite:///local.db', echo=True, echo_pool='info')
+        self.engine = create_engine('sqlite:///local.db', echo=True, echo_pool='debug')
         metadata = MetaData()
         self.todos = Table(
             'todos', metadata,
