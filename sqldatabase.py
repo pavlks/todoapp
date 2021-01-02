@@ -68,7 +68,7 @@ class SQLdatabase:
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "CLEARING TODAY TODOS" + "     " + "<" * 20)
         stmt = self.todos.update().\
                     where(self.todos.c.is_today == True).where(self.todos.c.completed == None).\
-                    values(description=False)
+                    values(is_today=False)
         connection = self.engine.connect()
         res = connection.execute(stmt)
         return True
