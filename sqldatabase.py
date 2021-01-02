@@ -44,7 +44,7 @@ class SQLdatabase:
 
     def show_today(self):
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING TODAY TODOS" + "     " + "<" * 20)
-        sel = select([self.todos]).where(self.todos.c.is_today == True).where(self.todos.c.completed != None)
+        sel = select([self.todos]).where(self.todos.c.is_today == True).where(self.todos.c.completed == None)
         connection = self.engine.connect()
         res = connection.execute(sel)
         ts = str()
