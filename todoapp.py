@@ -31,21 +31,21 @@ def telegram_webhook():
     if request.method == 'POST':
         update = request.get_json()  # types of update: https://core.telegram.org/bots/api#update
         message = update['message']['text'] if 'message' in update else None
-        chat_id = 789561316  # update['message']['from']['id'] if 'message' in update else None
+        user_id = update['message']['from']['id'] if 'message' else None # 789561316
         callback_query = update['callback_query']['data'] if 'callback_query' in update else None
         callback_query_id = update['callback_query']['id'] if 'callback_query' in update else None
         
         # if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):  # one-word command is matched (example "/start")
         
         if message and re.fullmatch('/today', message, flags=re.IGNORECASE):
-            todos = db.show_today()
+            todos = db.show_today(user_id)
             payload = {
                     'chat_id': chat_id,
                     'text': todos,
                     'parse_mode': 'HTML',
                     }
             requests.post(URL + '/sendMessage', json=payload)
-            #  todos = db.show_today()
+            #  todos = db.show_today(user_id)
             #  for todo in todos:
             
                 #  payload = {
@@ -72,7 +72,7 @@ def telegram_webhook():
                 #  requests.post(URL + '/editMessageReplyMarkup', json=params)
 
         elif message and re.fullmatch('/all', message, flags=re.IGNORECASE):
-            todos = db.get_pending()
+            todos = db.get_pending(user_id)
             for todo in todos:
                 
                 payload = {
@@ -102,7 +102,7 @@ def telegram_webhook():
                 requests.post(URL + '/editMessageReplyMarkup', json=params)
 
         elif message and re.fullmatch('/completed', message, flags=re.IGNORECASE):
-            todos = db.show_completed()
+            todos = db.show_completed(user_id)
                 
             payload = {
                     'chat_id': chat_id,
@@ -135,7 +135,7 @@ def telegram_webhook():
             params1 = {'callback_query_id': callback_query_id,}
             requests.post(URL + '/answerCallbackQuery', json=params1)
 
-            db.toggle_completed(todo_id)
+            db.toggle_completed(todo_id, user_id)
 
             #\U0001F3AF :dart: today;   \U00002611 :ballot_box_with_check: done;   \U0001F536 :large_orange_diamond: all todos
             if re.match('done', callback_query, flags=re.IGNORECASE):
@@ -151,7 +151,7 @@ def telegram_webhook():
         elif callback_query and re.match('today', callback_query, flags=re.IGNORECASE):
             todo_id, msg_id = [w for w in str(callback_query).split()[1:]]
             msg_id = int(msg_id)
-            db.toggle_today(todo_id)
+            db.toggle_today(todo_id, user_id)
             
             params = {'callback_query_id': callback_query_id,}
             requests.post(URL + '/answerCallbackQuery', json=params)
@@ -164,7 +164,7 @@ def telegram_webhook():
             params1 = {'callback_query_id': callback_query_id,}
             requests.post(URL + '/answerCallbackQuery', json=params1)
 
-            todos = db.show_completed(quantity)
+            todos = db.show_completed(quantity, user_id)
 
             msg_reply_markup['inline_keyboard'][0][0]['callback_data'] = f'completed {quantity + 10}'
             params2 = {'chat_id': chat_id, 'message_id': msg_id, 'text': todos, 'parse_mode': 'HTML', 'reply_markup': msg_reply_markup}
@@ -172,7 +172,7 @@ def telegram_webhook():
             
         elif callback_query and re.match('(confirm|cancel)', callback_query, flags=re.IGNORECASE):
             if callback_query == 'confirm':
-                db.clear_today()
+                db.clear_today(user_id)
                 params = {'callback_query_id': callback_query_id, 'text': f"items were cleared from today's to-do list", 'show_alert': True}
             else:
                 params = {'callback_query_id': callback_query_id, 'text': 'operation was cancelled', 'show_alert': True}
@@ -180,7 +180,7 @@ def telegram_webhook():
 
         else:
             todo = Todo.process_input(message)
-            db.add_record(todo.description, todo.notify_date, todo.notify_time, todo.is_today, todo.category)
+            db.add_record(todo.description, todo.notify_date, todo.notify_time, todo.is_today, todo.category, user_id)
             payload = {
                     'chat_id': chat_id,
                     'text': '<b>new to-do was added</b>',

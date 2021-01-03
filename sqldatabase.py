@@ -16,6 +16,7 @@ class SQLdatabase:
             Column('id', types.INTEGER, Sequence('todo_id_seq'), primary_key=True),
             # Compatibility with sqlite3 “native” date and datetime types (https://docs.sqlalchemy.org/en/13/dialects/sqlite.html?highlight=parse_decltypes#compatibility-with-sqlite3-native-date-and-datetime-types)
             Column('created', types.DATETIME),  
+            Column('user_id', types.INTEGER, nullable=False),  
             Column('description', types.TEXT),
             Column('notify_date', types.DATE),
             Column('notify_time', types.TIME),
@@ -25,7 +26,7 @@ class SQLdatabase:
         )
         metadata.create_all(self.engine, checkfirst=True)  # Defaults to True, won’t issue CREATEs for tables already present in the target database. To be aware of this option.:
 
-    def add_record(self, description, notify_date, notify_time, is_today, category):
+    def add_record(self, description, notify_date, notify_time, is_today, category, user_id):
         ins = self.todos.insert().values(
             description=description,
             created=datetime.datetime.utcnow(),
@@ -33,6 +34,7 @@ class SQLdatabase:
             notify_time=notify_time,
             is_today=is_today,
             category=category,
+            user_id=user_id,
             completed=None
         )
         connection = self.engine.connect()
@@ -42,9 +44,9 @@ class SQLdatabase:
             logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO CREATED id: {id}, description: [{description}]" + "     " + "<" * 20)
         return id
 
-    def show_today(self):
+    def show_today(self, user_id):
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING TODAY TODOS" + "     " + "<" * 20)
-        sel = select([self.todos]).where(self.todos.c.is_today == True).where(self.todos.c.completed == None)
+        sel = select([self.todos]).where(self.todos.c.is_today == True).where(self.todos.c.completed == None).where(self.todos.c.user_id == user_id)
         connection = self.engine.connect()
         res = connection.execute(sel)
         ts = str()
@@ -53,9 +55,9 @@ class SQLdatabase:
             ts += f"\U0001F3AF <b>{str(row['description']).upper()}</b>{nl}{nl}"
         return ts
 
-    def get_pending(self):
+    def get_pending(self, user_id):
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "GETTING PENDING TODOS" + "     " + "<" * 20)
-        sel = select([self.todos]).where(self.todos.c.completed == None)
+        sel = select([self.todos]).where(self.todos.c.completed == None).where(self.todos.c.user_id == user_id)
         connection = self.engine.connect()
         res = connection.execute(sel)
         tl = list()
@@ -64,17 +66,17 @@ class SQLdatabase:
             tl.append(rec)
         return tl
 
-    def clear_today(self):
+    def clear_today(self, user_id):
         logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + "CLEARING TODAY TODOS" + "     " + "<" * 20)
         stmt = self.todos.update().\
-                    where(self.todos.c.is_today == True).where(self.todos.c.completed == None).\
+                    where(self.todos.c.is_today == True).where(self.todos.c.completed == None).where(self.todos.c.user_id == user_id).\
                     values(is_today=False)
         connection = self.engine.connect()
         res = connection.execute(stmt)
         return True
 
-    def toggle_today(self, id):
-        sel = select([self.todos]).where(self.todos.c.id == id)
+    def toggle_today(self, id, user_id):
+        sel = select([self.todos]).where(self.todos.c.id == id).where(self.todos.c.user_id == user_id)
         connection = self.engine.connect()
         res = connection.execute(sel)
         row = res.fetchone()
@@ -82,19 +84,19 @@ class SQLdatabase:
         if status is True:
             logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO MOVED TO PENDING (id: {id}, description: {row['description']})" + "     " + "<" * 20)
             stmt = self.todos.update().\
-                        where(self.todos.c.id == id).\
+                        where(self.todos.c.id == id).where(self.todos.c.user_id == user_id).\
                         values(is_today=False)
         else:
             logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO MOVED TO TODAY (id: {id}, description: {row['description']})" + "     " + "<" * 20)
             stmt = self.todos.update().\
-                        where(self.todos.c.id == id).\
+                        where(self.todos.c.id == id).where(self.todos.c.user_id == user_id).\
                         values(is_today=True)
         connection = self.engine.connect()
         res = connection.execute(stmt)
         return not status
 
-    def toggle_completed(self, id):
-        sel = select([self.todos]).where(self.todos.c.id == id)
+    def toggle_completed(self, id, user_id):
+        sel = select([self.todos]).where(self.todos.c.id == id).where(self.todos.c.user_id == user_id)
         connection = self.engine.connect()
         res = connection.execute(sel)
         row = res.fetchone()
@@ -102,19 +104,19 @@ class SQLdatabase:
         if status is True:
             logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO SET AS PENDING (id: {id}, description: {row['description']})" + "     " + "<" * 20)
             stmt = self.todos.update().\
-                        where(self.todos.c.id == id).\
+                        where(self.todos.c.id == id).where(self.todos.c.user_id == user_id).\
                         values(completed=None)
         else:
             logging.info("  " + str(datetime.datetime.now()) + "  " + ">" * 20 + "     " + F"TODO SET AS COMPLETED (id: {id}, description: {row['description']})" + "     " + "<" * 20)
             stmt = self.todos.update().\
-                        where(self.todos.c.id == id).\
+                        where(self.todos.c.id == id).where(self.todos.c.user_id == user_id).\
                         values(completed=datetime.datetime.utcnow())
         res = connection.execute(stmt)
         return not status
 
-    def show_completed(self, quantity=10):
+    def show_completed(self, user_id, quantity=10):
         logging.info("  " + str(datetime.datetime.utcnow()) + "  " + ">" * 20 + "     " + "GETTING COMPLETED TODOS" + "     " + "<" * 20)
-        sel = select([self.todos]).where(self.todos.c.completed != None)
+        sel = select([self.todos]).where(self.todos.c.completed != None).where(self.todos.c.user_id == user_id)
         connection = self.engine.connect()
         res = connection.execute(sel)
         ts = str()
