@@ -31,9 +31,10 @@ def telegram_webhook():
     if request.method == 'POST':
         update = request.get_json()  # types of update: https://core.telegram.org/bots/api#update
         message = update['message']['text'] if 'message' in update else None
-        chat_id = update['message']['from']['id'] if 'message' else None # 789561316
+        chat_id = update['message']['from']['id'] if 'message' in update else None # 789561316
         callback_query = update['callback_query']['data'] if 'callback_query' in update else None
         callback_query_id = update['callback_query']['id'] if 'callback_query' in update else None
+        chat_id = update['callback_query']['from']['id'] if 'callback_query' in update else None
         
         # if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):  # one-word command is matched (example "/start")
         
