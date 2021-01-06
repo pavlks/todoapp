@@ -40,6 +40,14 @@ def telegram_webhook():
 
         # if re.fullmatch('/\w+\s?', message, flags=re.IGNORECASE):  # one-word command is matched (example "/start")
         
+        if message and re.fullmatch('/start', message, flags=re.IGNORECASE):
+            payload = {
+                    'chat_id': chat_id,
+                    'text': 'Привет, давай, создавай свой ту-ду лист',
+                    'parse_mode': 'HTML',
+                    }
+            requests.post(URL + '/sendMessage', json=payload)
+
         if message and re.fullmatch('/today', message, flags=re.IGNORECASE):
             todos = db.show_today(chat_id)
             payload = {
