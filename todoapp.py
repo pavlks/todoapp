@@ -48,7 +48,7 @@ def telegram_webhook():
                     }
             requests.post(URL + '/sendMessage', json=payload)
 
-        if message and re.fullmatch('/today', message, flags=re.IGNORECASE):
+        elif message and re.fullmatch('/today', message, flags=re.IGNORECASE):
             todos = db.show_today(chat_id)
             payload = {
                     'chat_id': chat_id,
