@@ -117,7 +117,7 @@ def telegram_webhook():
             m = requests.post(URL + '/sendMessage', json=payload)
 
         elif upd.type == 'callback_query' and re.match('(done|undone)', upd.cbq_data, flags=re.IGNORECASE):
-            todo_id, msg_id = [w for w in str(callback_query).split()[1:]]
+            todo_id, msg_id = [w for w in str(upd.cbq_data).split()[1:]]
             msg_id = int(msg_id)
             msg_text = upd.msg_text
             msg_reply_markup = upd.reply_mu
@@ -139,7 +139,7 @@ def telegram_webhook():
             requests.post(URL + '/editMessageText', json=params2)
 
         elif upd.type == 'callback_query' and re.match('today', upd.cbq_data, flags=re.IGNORECASE):
-            todo_id, msg_id = [w for w in str(callback_query).split()[1:]]
+            todo_id, msg_id = [w for w in str(upd.cbq_data).split()[1:]]
             msg_id = int(msg_id)
             db.toggle_today(todo_id, upd.from_id)
             
