@@ -146,7 +146,7 @@ def telegram_webhook():
             params = {'callback_query_id': upd.cbq_id,}
             requests.post(URL + '/answerCallbackQuery', json=params)
 
-        elif upd.type == 'callback_query' and re.match('completed', upd.cbq_id, flags=re.IGNORECASE):
+        elif upd.type == 'callback_query' and re.match('completed', upd.cbq_data, flags=re.IGNORECASE):
             quantity = int(str(upd.cbq_data).split()[1])
             msg_id = upd.msg_id
             msg_reply_markup = upd.reply_mu
