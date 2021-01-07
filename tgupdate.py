@@ -1,8 +1,5 @@
-
-
-class Update():
-
-    __init__(self, update):
+class Update:
+    def __init__(self, update):
         self.id = update['id']
         if 'message' in update:
             self.type = 'message'
