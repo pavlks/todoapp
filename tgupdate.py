@@ -1,6 +1,6 @@
 class Update:
     def __init__(self, update):
-        self.id = update['id']
+        self.id = update['update_id']
         if 'message' in update:
             self.type = 'message'
             self.from_id = update['message']['from']['id']
